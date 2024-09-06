@@ -23,7 +23,6 @@ function createBot(token) {
     let timeout; // ประกาศตัวแปร timeout ที่นี่
 
     client.on('ready', () => {
-        console.log(`Logged in as ${client.user.tag}`);
         connectToVoiceChannel(); // เชื่อมต่อไปยังห้องที่กำหนดทันที
         monitorVoiceState(); // ติดตามสถานะห้องเสียง
     });
@@ -49,7 +48,7 @@ function createBot(token) {
 
     function connectToVoiceChannel() {
         const guild = client.guilds.cache.get(GUILD_ID);
-        if (!guild) return console.error('Could not find guild');
+        if (!guild) return;
 
         const channel = guild.channels.cache.get(TARGET_VOICE_CHANNEL_ID);
 
@@ -63,7 +62,6 @@ function createBot(token) {
                 ws = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
 
                 ws.on('open', () => {
-                    console.log(`WebSocket connected for ${client.user.tag}.`);
                     const payload = {
                         op: 2,
                         d: {
@@ -95,26 +93,19 @@ function createBot(token) {
                     const { t } = payload;
 
                     if (t === "READY") {
-                        console.log(`Connected to voice channel ${TARGET_VOICE_CHANNEL_ID} for ${client.user.tag}.`);
                         isConnected = true; // ตั้งค่าสถานะว่าตอนนี้เชื่อมต่อกับห้องเสียงแล้ว
-                    } else {
-                        console.log(`Received message: ${data}`);
                     }
                 });
 
                 ws.on('close', () => {
-                    console.log(`WebSocket disconnected for ${client.user.tag}. Reconnecting...`);
                     isConnected = false;
                     setTimeout(connectToVoiceChannel, RECONNECT_INTERVAL); // เชื่อมต่อใหม่หลังจากเวลาที่กำหนด
                 });
 
                 ws.on('error', (error) => {
-                    console.error(`WebSocket error for ${client.user.tag}:`, error);
                     ws.close(); // ปิดการเชื่อมต่อ WebSocket ในกรณีที่เกิดข้อผิดพลาด
                 });
             }
-        } else {
-            console.error('Voice channel not found or not a voice channel.');
         }
     }
 
