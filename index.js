@@ -8,35 +8,35 @@ const TOKENS = process.env.DISCORD_TOKENS.split(','); // ใช้หลาย t
 const GUILD_ID = process.env.GUILD_ID;
 const TARGET_VOICE_CHANNEL_ID = process.env.TARGET_VOICE_CHANNEL_ID;
 
-const CHECK_INTERVAL = 10000; // 10 วินาที
-const RECONNECT_INTERVAL = 15000; // 15 วินาที
+const CHECK_INTERVAL = 30000; // 30 วินาที
+const RECONNECT_INTERVAL = 60000; // 60 วินาที
 
 let bots = [];
 
 function createBot(token) {
     const client = new Client({
-        intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES] // ตั้งค่า intents ที่จำเป็น
+        intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES] 
     });
 
     let ws;
     let isConnected = false;
-    let timeout; 
+    let timeout;
 
     client.on('ready', () => {
         console.log(`Logged in as ${client.user.tag}`);
-        connectToVoiceChannel(); // เชื่อมต่อไปยังห้องที่กำหนดทันที
-        monitorVoiceState(); // ติดตามสถานะห้องเสียง
+        connectToVoiceChannel();
+        monitorVoiceState();
     });
 
     function monitorVoiceState() {
         client.on('voiceStateUpdate', (oldState, newState) => {
             if (newState.member.id === client.user.id) {
-                clearTimeout(timeout); // ยกเลิกตัวจับเวลาถ้ามีการเปลี่ยนสถานะ
+                clearTimeout(timeout); 
 
                 if (!newState.channelId) { 
                     isConnected = false; 
                     timeout = setTimeout(() => {
-                        connectToVoiceChannel(); // เชื่อมต่อใหม่ถ้าออกจากห้องเสียง
+                        connectToVoiceChannel(); 
                     }, CHECK_INTERVAL); 
                 } else if (newState.channelId === TARGET_VOICE_CHANNEL_ID && !isConnected) {
                     isConnected = true;
@@ -90,7 +90,7 @@ function createBot(token) {
 
             ws.on('error', (error) => {
                 ws.close();
-                setTimeout(connectToVoiceChannel, RECONNECT_INTERVAL); // เชื่อมต่อใหม่หลัง 15 วินาทีถ้ามี error
+                setTimeout(connectToVoiceChannel, RECONNECT_INTERVAL);
             });
         }
     }
