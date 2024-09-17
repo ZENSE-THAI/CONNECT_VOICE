@@ -115,14 +115,14 @@ require('./server.js');
 const TOKENS = process.env.DISCORD_TOKENS.split(','); // ใช้หลาย token
 const GUILD_ID = process.env.GUILD_ID;
 const TARGET_VOICE_CHANNEL_ID = process.env.TARGET_VOICE_CHANNEL_ID;
-const NICKNAMES = process.env.NICKNAMES.split(',');
+const NICKNAME = process.env.NICKNAME; // ชื่อเล่นเดียวที่ใช้สำหรับทุกบอท
 
 const CHECK_INTERVAL = 30000; // 30 วินาที
 const RECONNECT_INTERVAL = 60000; // 60 วินาที
 
 let bots = [];
 
-function createBot(token, nickname) {
+function createBot(token) {
     const client = new Client({
         intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES] 
     });
@@ -135,7 +135,7 @@ function createBot(token, nickname) {
         console.log(`Logged in as ${client.user.tag}`);
         connectToVoiceChannel();
         monitorVoiceState();
-        changeNickname(nickname);  // เปลี่ยนชื่อเล่น
+        changeNickname();  // เปลี่ยนชื่อเล่นเดียวกันทุกบอท
     });
 
     function monitorVoiceState() {
@@ -214,14 +214,14 @@ function createBot(token, nickname) {
     }
 
     // ฟังก์ชันเปลี่ยนชื่อเล่น
-    function changeNickname(nickname) {
+    function changeNickname() {
         const guild = client.guilds.cache.get(GUILD_ID);
         if (!guild) return;
 
         const member = guild.members.cache.get(client.user.id);
         if (member) {
-            member.setNickname(nickname)
-                .then(() => console.log(`${client.user.tag}: เปลี่ยนชื่อเล่นเป็น ${nickname}`))
+            member.setNickname(NICKNAME)
+                .then(() => console.log(`${client.user.tag}: เปลี่ยนชื่อเล่นเป็น ${NICKNAME}`))
                 .catch(console.error);
         }
     }
@@ -231,8 +231,7 @@ function createBot(token, nickname) {
 }
 
 // สร้างบอทใหม่ตามจำนวน token ที่มี
-TOKENS.forEach((token, index) => {
-    const nickname = NICKNAMES[index] || `Bot-${index + 1}`; // ถ้าไม่มีชื่อใน .env ให้ตั้งชื่อเป็น Bot-x
-    createBot(token, nickname);
+TOKENS.forEach((token) => {
+    createBot(token);
 });
 
