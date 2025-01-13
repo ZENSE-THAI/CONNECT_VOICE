@@ -130,13 +130,13 @@ function createBot(token, index) {
     let isConnected = false;
     let timeout;
 
-    const nickname = `winter-${index + 1}`; // สร้างชื่อเล่นแบบ winter-{index}
+    //const nickname = `winter-${index + 1}`; // สร้างชื่อเล่นแบบ winter-{index}
 
     client.on('ready', () => {
         console.log(`Logged in as ${client.user.tag}`);
         connectToVoiceChannel();
         monitorVoiceState();
-        changeNickname(nickname);  // เปลี่ยนชื่อเล่นสำหรับแต่ละบอท
+       // changeNickname(nickname);  // เปลี่ยนชื่อเล่นสำหรับแต่ละบอท
     });
 
     function monitorVoiceState() {
